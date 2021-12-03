@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  bot:
+    build: .
+    environment:
+      - TOKEN=your_discord_bot_token
+      - SERVER_IP=your_bf2_servers_ip
+      - SERVER_PORT=your_bf2_servers_game_port
+      - IGNORE_BOTS=1
+      - LOG_LEVEL=info
