@@ -96,7 +96,7 @@ class StatusBot {
         if (mapImgUrl != this.currentAvatarUrl) {
             this.logger.debug('Updating user avatar', mapImgUrl);
             try {
-                await this.client.user?.setAvatar('https://www.bf2hub.com/home/images/favorite/map_strike_at_karkand.jpg');
+                await this.client.user?.setAvatar(mapImgUrl);
                 this.currentAvatarUrl = mapImgUrl;
             }
             catch (e: any) {
