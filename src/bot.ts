@@ -9,6 +9,7 @@ class StatusBot {
     private serverIp: string;
     private serverPort: string;
     private ignoreBots: boolean;
+    private updateUsername: boolean;
 
     private client: Client;
     private updateTask: cron.ScheduledTask;
@@ -16,11 +17,12 @@ class StatusBot {
     private currentActivityName = '';
     private currentAvatarUrl = '';
 
-    constructor(token: string, serverIp: string, serverPort: string, ignoreBots = true) {
+    constructor(token: string, serverIp: string, serverPort: string, ignoreBots = true, updateUsername = false) {
         this.token = token;
         this.serverIp = serverIp;
         this.serverPort = serverPort;
         this.ignoreBots = ignoreBots;
+        this.updateUsername = updateUsername;
 
         this.logger = logger.getChildLogger({ name: 'BotLogger'});
         this.client = new Client({ intents: [Intents.FLAGS.GUILDS] });

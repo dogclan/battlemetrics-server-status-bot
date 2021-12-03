@@ -7,4 +7,5 @@ export default abstract class Config {
     static readonly SERVER_IP: string = process.env.SERVER_IP || '';
     static readonly SERVER_PORT: string = process.env.SERVER_PORT || '16567';
     static readonly IGNORE_BOTS: boolean = !!Number(process.env.IGNORE_BOTS || 1);
+    static readonly UPDATE_USERNAME: boolean = !!Number(process.env.UPDATE_USERNAME || 0);
 }
