@@ -92,7 +92,7 @@ class StatusBot {
         }
         
         const mapImgSlug = 'map_' + String(mapName).toLowerCase().replace(/ /g, '_');
-        const mapImgUrl = `https://www.bf2hub.com/home/images/favorite/${mapImgSlug}`;
+        const mapImgUrl = `https://www.bf2hub.com/home/images/favorite/${mapImgSlug}.jpg`;
         if (mapImgUrl != this.currentAvatarUrl) {
             this.logger.debug('Updating user avatar', mapImgUrl);
             try {
