@@ -28,7 +28,7 @@ class StatusBot {
         this.client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
         this.client.once('ready', () => {
-            this.logger.debug('Client is ready, starting update task');
+            this.logger.info('Client is ready, starting update task');
             this.updateTask.start();
         });
 
@@ -36,7 +36,7 @@ class StatusBot {
         this.client.login(this.token);
 
         this.updateTask = cron.schedule('*/2 * * * *', async () => {
-            this.logger.debug('Updating game server status');
+            this.logger.info('Updating game server status');
             try {
                 await this.updateServerStatus();
                 this.logger.debug('Game server status update complete');
