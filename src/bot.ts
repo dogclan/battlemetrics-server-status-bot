@@ -63,7 +63,7 @@ class StatusBot {
             numPlayers = server?.players?.filter(playerFilter)?.length;
         }
 
-        const activityName = `${numPlayers}/${maxPlayers}`;
+        const activityName = `${numPlayers}/${maxPlayers} - ${mapName}`;
         if (activityName != this.currentActivityName) {
             this.logger.debug('Updating user activity');
             try {
