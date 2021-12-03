@@ -64,16 +64,26 @@ class StatusBot {
         const activityName = `${numPlayers}/${maxPlayers}`;
         if (activityName != this.currentActivityName) {
             this.logger.debug('Updating user activity');
-            this.client.user?.setActivity(activityName, { type: 'PLAYING' });
-            this.currentActivityName = activityName;
+            try {
+                this.client.user?.setActivity(activityName, { type: 'PLAYING' });
+                this.currentActivityName = activityName;
+            }
+            catch (e: any) {
+                this.logger.error('Failed to update user activity', e.message);
+            }
         }
         else {
             this.logger.debug('Activity name is unchanged, no update required');
         }
 
-        if (name != this.client.user?.username) {
+        if (name != this.client.user?.username && this.updateUsername) {
             this.logger.debug('Updating username to match server name');
-            this.client.user?.setUsername(name);
+            try {
+                await this.client.user?.setUsername(name);
+            }
+            catch (e: any) {
+                this.logger.error('Failed to update username', e.message);
+            }
         }
         else {
             this.logger.debug('Username matches server name, no update required');
@@ -83,8 +93,13 @@ class StatusBot {
         const mapImgUrl = `https://www.bf2hub.com/home/images/favorite/${mapImgSlug}`;
         if (mapImgUrl != this.currentAvatarUrl) {
             this.logger.debug('Updating user avatar', mapImgUrl);
-            this.client.user?.setAvatar('https://www.bf2hub.com/home/images/favorite/map_strike_at_karkand.jpg');
-            this.currentAvatarUrl = mapImgUrl;
+            try {
+                await this.client.user?.setAvatar('https://www.bf2hub.com/home/images/favorite/map_strike_at_karkand.jpg');
+                this.currentAvatarUrl = mapImgUrl;
+            }
+            catch (e: any) {
+                this.logger.error('Failed to update user avatar', e.message);
+            }
         }
     }
 }
