@@ -6,5 +6,5 @@ services:
       - TOKEN=your_discord_bot_token
       - SERVER_IP=your_bf2_servers_ip
       - SERVER_PORT=your_bf2_servers_game_port
-      - IGNORE_BOTS=1
+      - BOT_TREATMENT=ignore
       - LOG_LEVEL=info

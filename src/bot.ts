@@ -4,11 +4,13 @@ import cron from 'node-cron';
 import { Logger } from 'tslog';
 import logger from './logger';
 
+export type BotTreatment = 'ignore' | 'separate' | 'subtract-slots' | 'include'
+
 class StatusBot {
     private token: string;
     private serverIp: string;
     private serverPort: string;
-    private ignoreBots: boolean;
+    private botTreatment: BotTreatment;
     private updateUsername: boolean;
 
     private client: Client;
@@ -17,11 +19,11 @@ class StatusBot {
     private currentActivityName = '';
     private currentAvatarUrl = '';
 
-    constructor(token: string, serverIp: string, serverPort: string, ignoreBots = true, updateUsername = false) {
+    constructor(token: string, serverIp: string, serverPort: string, botTreatment: BotTreatment = 'ignore', updateUsername = false) {
         this.token = token;
         this.serverIp = serverIp;
         this.serverPort = serverPort;
-        this.ignoreBots = ignoreBots;
+        this.botTreatment = botTreatment;
         this.updateUsername = updateUsername;
 
         this.logger = logger.getChildLogger({ name: 'BotLogger'});
@@ -53,19 +55,33 @@ class StatusBot {
         this.logger.debug('Fetching server status from bflist');
         const resp = await axios.get(`https://api.bflist.io/bf2/v1/servers/${this.serverIp}:${this.serverPort}`);
         const server = resp.data;
-        const { name, mapName, maxPlayers } = server;
-        let { numPlayers } = server;
+        const { name, mapName, numPlayers, maxPlayers } = server;
 
-        if (this.ignoreBots) {
-            this.logger.debug('Filtering out bots to determine player count');
-            // Only count players who: are not flagged as a bot and have a valid ping, score, kill total of death total
-            const playerFilter = (player: any) => !player.aibot && (player.ping > 0 || player.score != 0 || player.kills != 0 || player.deaths != 0);
-            numPlayers = server?.players?.filter(playerFilter)?.length;
+        this.logger.debug('Filtering out bots to determine player count');
+        // Only count players who: are not flagged as a bot and have a valid ping, score, kill total of death total
+        const playerFilter = (player: any) => !player.aibot && (player.ping > 0 || player.score != 0 || player.kills != 0 || player.deaths != 0);
+        const players: number = server?.players?.filter(playerFilter)?.length;
+        const bots: number = server?.players?.length - players;
+
+        let playerIndicator: string;
+        switch (this.botTreatment) {
+            case 'ignore':
+                playerIndicator = `${players}/${maxPlayers}`;
+                break;
+            case 'separate':
+                playerIndicator = `${players}(${bots})/${maxPlayers}`;
+                break;
+            case 'subtract-slots':
+                playerIndicator = `${players}/${maxPlayers - bots}`;
+                break;
+
+            default:
+                playerIndicator = `${numPlayers}/${maxPlayers}`;
         }
 
-        const activityName = `${numPlayers}/${maxPlayers} - ${mapName}`;
+        const activityName = `${playerIndicator} - ${mapName}`;
         if (activityName != this.currentActivityName) {
-            this.logger.debug('Updating user activity');
+            this.logger.debug('Updating user activity', activityName);
             try {
                 this.client.user?.setActivity(activityName, { type: 'PLAYING' });
                 this.currentActivityName = activityName;
