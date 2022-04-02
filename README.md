@@ -1,1 +1,1 @@
-# bf2-server-status-bot
+# scum-server-status-bot

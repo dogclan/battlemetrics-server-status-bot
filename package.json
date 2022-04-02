@@ -1,7 +1,7 @@
 {
-  "name": "bf2-server-status-bot",
+  "name": "scum-server-status-bot",
   "version": "1.0.0",
-  "description": "Discord bot to show number of currently active players on a Battlefield 2 server",
+  "description": "Discord bot to show number of currently active players on a SCUM server",
   "main": "dist/index.js",
   "private": true,
   "engines": {
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cetteup/bf2-server-status-bot.git"
+    "url": "git+https://github.com/dogclan/scum-server-status-bot.git"
   },
   "keywords": [
     "battlefield",
@@ -28,9 +28,9 @@
   "author": "cetteup",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cetteup/bf2-server-status-bot/issues"
+    "url": "https://github.com/dogclan/scum-server-status-bot/issues"
   },
-  "homepage": "https://github.com/cetteup/bf2-server-status-bot#readme",
+  "homepage": "https://github.com/dogclan/scum-server-status-bot#readme",
   "devDependencies": {
     "@tsconfig/node14": "^1.0.1",
     "@tsconfig/recommended": "^1.0.1",

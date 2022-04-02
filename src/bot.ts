@@ -3,27 +3,21 @@ import { Client, Intents } from 'discord.js';
 import cron from 'node-cron';
 import { Logger } from 'tslog';
 import logger from './logger';
-
-export type BotTreatment = 'ignore' | 'separate' | 'subtract-slots' | 'include'
+import Config from './config';
 
 class StatusBot {
-    private token: string;
-    private serverIp: string;
-    private serverPort: string;
-    private botTreatment: BotTreatment;
-    private updateUsername: boolean;
+    private readonly token: string;
+    private readonly serverId: string;
+    private readonly updateUsername: boolean;
 
     private client: Client;
     private updateTask: cron.ScheduledTask;
     private logger: Logger;
     private currentActivityName = '';
-    private currentAvatarUrl = '';
 
-    constructor(token: string, serverIp: string, serverPort: string, botTreatment: BotTreatment = 'ignore', updateUsername = false) {
+    constructor(token: string, serverId: string, updateUsername = false) {
         this.token = token;
-        this.serverIp = serverIp;
-        this.serverPort = serverPort;
-        this.botTreatment = botTreatment;
+        this.serverId = serverId;
         this.updateUsername = updateUsername;
 
         this.logger = logger.getChildLogger({ name: 'BotLogger'});
@@ -52,38 +46,20 @@ class StatusBot {
     }
 
     private async updateServerStatus(): Promise<void> {
-        this.logger.debug('Fetching server status from bflist');
-        const resp = await axios.get(`https://api.bflist.io/bf2/v1/servers/${this.serverIp}:${this.serverPort}`);
+        this.logger.debug('Fetching server status from battlemetrics');
+        const resp = await axios.get(`https://api.battlemetrics.com/servers/${this.serverId}`, {
+            headers: {
+                'Authorization': `Bearer ${Config.BATTLEMETRICS_TOKEN}`
+            }
+        });
         const server = resp.data;
-        const { name, mapName, numPlayers, maxPlayers } = server;
+        const { name, players } = server.data.attributes;
 
-        this.logger.debug('Filtering out bots to determine player count');
-        // Only count players who: are not flagged as a bot and have a valid ping, score, kill total of death total
-        const playerFilter = (player: any) => !player.aibot && (player.ping > 0 || player.score != 0 || player.kills != 0 || player.deaths != 0);
-        const players: number = server?.players?.filter(playerFilter)?.length;
-        const bots: number = server?.players?.length - players;
-
-        let playerIndicator: string;
-        switch (this.botTreatment) {
-            case 'ignore':
-                playerIndicator = `${players}/${maxPlayers}`;
-                break;
-            case 'separate':
-                playerIndicator = `${players}(${bots})/${maxPlayers}`;
-                break;
-            case 'subtract-slots':
-                playerIndicator = `${players}/${maxPlayers - bots}`;
-                break;
-
-            default:
-                playerIndicator = `${numPlayers}/${maxPlayers}`;
-        }
-
-        const activityName = `${playerIndicator} - ${mapName}`;
+        const activityName = `${players} ${players == 1 ? 'player' : 'players'} online`;
         if (activityName != this.currentActivityName) {
             this.logger.debug('Updating user activity', activityName);
             try {
-                this.client.user?.setActivity(activityName, { type: 'PLAYING' });
+                this.client.user?.setActivity(activityName, { type: 'WATCHING' });
                 this.currentActivityName = activityName;
             }
             catch (e: any) {
@@ -105,19 +81,6 @@ class StatusBot {
         }
         else {
             this.logger.debug('Username matches server name, no update required');
-        }
-        
-        const mapImgSlug = 'map_' + String(mapName).toLowerCase().replace(/ /g, '_');
-        const mapImgUrl = `https://www.bf2hub.com/home/images/favorite/${mapImgSlug}.jpg`;
-        if (mapImgUrl != this.currentAvatarUrl) {
-            this.logger.debug('Updating user avatar', mapImgUrl);
-            try {
-                await this.client.user?.setAvatar(mapImgUrl);
-                this.currentAvatarUrl = mapImgUrl;
-            }
-            catch (e: any) {
-                this.logger.error('Failed to update user avatar', e.message);
-            }
         }
     }
 }
