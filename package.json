@@ -1,7 +1,7 @@
 {
-  "name": "scum-server-status-bot",
+  "name": "battlemetrics-server-status-bot",
   "version": "1.0.0",
-  "description": "Discord bot to show number of currently active players on a SCUM server",
+  "description": "Discord bot to show number of currently active players on a server listed on battlemetrics.com",
   "main": "dist/index.js",
   "private": true,
   "engines": {

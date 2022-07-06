@@ -1,1 +1,1 @@
-# scum-server-status-bot
+# battlemetrics-server-status-bot

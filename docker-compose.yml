@@ -5,5 +5,5 @@ services:
     environment:
       - DISCORD_TOKEN=your_discord_bot_token
       - BATTLEMETRICS_TOKEN=your_battlemetrics_token
-      - SERVER_ID=your_scum_servers_battlemetrics_id
+      - SERVER_ID=your_servers_battlemetrics_id
       - LOG_LEVEL=info
